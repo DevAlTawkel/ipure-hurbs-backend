@@ -59,16 +59,16 @@ See the full endpoint list in [routes/api.php](routes/api.php).
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
 | `APP_URL` | Full public URL of the app |
 
-## Deployment (Render)
+## Deployment (Railway)
 
-This repo includes a `render.yaml` blueprint.
+This repo includes `railway.json` + `nixpacks.toml`.
 
 1. Push this repo to GitHub
-2. Go to [render.com](https://render.com) → New → Blueprint
-3. Connect your GitHub repo
-4. Render auto-creates the web service + MySQL database
-5. Set `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET` in the Render dashboard
-6. Deploy
+2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
+3. Select this repo
+4. Add a **MySQL** plugin from the Railway dashboard
+5. Set environment variables (see below)
+6. Railway auto-builds and deploys
 
 ## Key Features
 
