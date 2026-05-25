@@ -1,7 +1,13 @@
 FROM dunglas/frankenphp:php8.3
 
-RUN install-php-extensions intl zip
+# Install required PHP extensions (IMPORTANT ADD pdo_mysql)
+RUN install-php-extensions \
+    intl \
+    zip \
+    pdo_mysql \
+    mysqli
 
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
