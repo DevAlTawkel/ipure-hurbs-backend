@@ -14,4 +14,5 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# IMPORTANT: point FrankenPHP to Laravel public folder
+CMD ["frankenphp", "run", "--config", "/app/Caddyfile"]
