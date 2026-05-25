@@ -1,6 +1,6 @@
 FROM dunglas/frankenphp:php8.3
 
-# Install required PHP extensions (IMPORTANT ADD pdo_mysql)
+# Install required PHP extensions (IMPORTANT)
 RUN install-php-extensions \
     intl \
     zip \
@@ -16,6 +16,7 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader
 
+# Clear Laravel cache
 RUN php artisan config:clear
 RUN php artisan cache:clear
 RUN php artisan route:clear
