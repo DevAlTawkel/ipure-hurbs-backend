@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(RAILWAY_API_TOKEN=c8938b9e-18c1-4c22-addb-f9a5c2044494 railway logs --build bf37bf4a-327d-4281-ade5-08b17cb07201)"
+    ]
+  }
+}
