@@ -9,14 +9,43 @@ class BrandSeeder extends Seeder
 {
     public function run(): void
     {
-        Brand::create([
-            'name' => 'Himalaya',
-            'slug' => 'himalaya',
-        ]);
+        $brands = [
+            [
+                'name' => 'IPure Herbs',
+                'slug' => 'ipure-herbs',
+                'description' => 'Premium natural and herbal products for health and wellness. Committed to quality and purity.',
+                'logo' => null,
+                'website' => 'https://ipurehers.com',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Himalaya',
+                'slug' => 'himalaya',
+                'description' => 'World-renowned Ayurvedic brand with 90+ years of heritage.',
+                'logo' => null,
+                'website' => 'https://himalayawellness.in',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Dabur',
+                'slug' => 'dabur',
+                'description' => 'Leading Ayurvedic pharmaceutical company in India.',
+                'logo' => null,
+                'website' => 'https://www.dabur.com',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Patanjali',
+                'slug' => 'patanjali',
+                'description' => 'Ayurveda-based FMCG company with organic products.',
+                'logo' => null,
+                'website' => 'https://www.patanjaliayurved.net',
+                'is_active' => true,
+            ],
+        ];
 
-        Brand::create([
-            'name' => 'Dabur',
-            'slug' => 'dabur',
-        ]);
+        foreach ($brands as $brand) {
+            Brand::create($brand);
+        }
     }
 }

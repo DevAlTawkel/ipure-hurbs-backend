@@ -14,19 +14,26 @@ class Product extends Model
         'category_id',
         'brand_id',
         'sku',
+        'barcode',
         'name',
         'slug',
         'short_description',
         'description',
         'price',
         'compare_price',
+        'sale_price',
         'rating',
         'review_count',
         'stock',
+        'low_stock_threshold',
+        'stock_status',
+        'sales_count',
         'image',
         'is_active',
         'is_featured',
         'is_trending',
+        'seo_title',
+        'seo_description',
     ];
 
     protected function casts(): array
@@ -34,9 +41,12 @@ class Product extends Model
         return [
             'price'         => 'decimal:2',
             'compare_price' => 'decimal:2',
+            'sale_price'    => 'decimal:2',
             'rating'        => 'decimal:1',
             'review_count'  => 'integer',
             'stock'         => 'integer',
+            'low_stock_threshold' => 'integer',
+            'sales_count'   => 'integer',
             'is_active'     => 'boolean',
             'is_featured'   => 'boolean',
             'is_trending'   => 'boolean',
@@ -69,6 +79,16 @@ public function images(): HasMany
 public function reviews(): HasMany
 {
     return $this->hasMany(Review::class)->where('is_approved', true);
+}
+
+public function wishlists(): HasMany
+{
+    return $this->hasMany(Wishlist::class);
+}
+
+public function stockMovements(): HasMany
+{
+    return $this->hasMany(StockMovement::class)->orderByDesc('created_at');
 }
 
     public function imageUrl(): ?string

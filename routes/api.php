@@ -5,10 +5,13 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,6 +81,28 @@ Route::middleware('auth:sanctum')->prefix('orders')->group(function () {
 
 // ─── Reviews (post requires auth, get is public — handled above) ─────────────
 Route::middleware('auth:sanctum')->post('/products/{product}/reviews', [ReviewController::class, 'store']);
+
+// ─── Wishlist (authenticated customers only) ─────────────────────────────────
+Route::middleware('auth:sanctum')->prefix('wishlist')->group(function () {
+    Route::get('/', [WishlistController::class, 'index']);
+    Route::get('/count', [WishlistController::class, 'count']);
+    Route::post('/', [WishlistController::class, 'store']);
+    Route::delete('/', [WishlistController::class, 'destroy']);
+});
+
+// ─── Coupons ──────────────────────────────────────────────────────────────────
+Route::prefix('coupons')->group(function () {
+    Route::post('/validate', [CouponController::class, 'validate']);
+    Route::get('/{code}', [CouponController::class, 'show']);
+});
+
+// ─── Inventory Management (public endpoints) ──────────────────────────────────
+Route::prefix('inventory')->group(function () {
+    Route::get('/report', [InventoryController::class, 'report']);
+    Route::get('/low-stock', [InventoryController::class, 'lowStock']);
+    Route::get('/out-of-stock', [InventoryController::class, 'outOfStock']);
+    Route::get('/products/{product}/movements', [InventoryController::class, 'movements']);
+});
 
 // ─── Stripe Webhook (no CSRF / auth) ─────────────────────────────────────────
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])

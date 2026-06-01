@@ -53,6 +53,11 @@ class Customer extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     public function defaultAddress(): ?Address
     {
         return $this->addresses()->where('is_default', true)->first();
