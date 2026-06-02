@@ -102,7 +102,7 @@ public function stockMovements(): HasMany
 
     public function formattedPrice(): string
     {
-        return '₹'.number_format((float) $this->price, 2);
+        return '$'.number_format((float) $this->price, 2);
     }
 
     public function inStock(): bool

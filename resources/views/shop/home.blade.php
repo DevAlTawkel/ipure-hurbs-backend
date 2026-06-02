@@ -10,7 +10,7 @@
                 Natural herbs & supplements for your health
             </h1>
             <p class="mt-4 max-w-xl text-lg text-emerald-100">
-                Wide range of authentic products — fresh ingredients, secure checkout, free shipping on orders over ₹599.
+                Wide range of authentic products — fresh ingredients, secure checkout, free shipping on orders over $50.
             </p>
             <a href="{{ route('shop.products') }}" class="mt-8 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-emerald-900 hover:bg-emerald-50">
                 Shop All Products
@@ -78,7 +78,7 @@
             </div>
             <div class="text-center">
                 <p class="text-3xl font-bold text-emerald-800">Free</p>
-                <p class="mt-1 text-sm text-stone-600">Shipping over ₹599</p>
+                <p class="mt-1 text-sm text-stone-600">Shipping over $50</p>
             </div>
             <div class="text-center">
                 <p class="text-3xl font-bold text-emerald-800">Secure</p>

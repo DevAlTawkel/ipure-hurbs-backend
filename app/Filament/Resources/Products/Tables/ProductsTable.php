@@ -25,7 +25,7 @@ class ProductsTable
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('sku')->label('SKU')->searchable(),
                 TextColumn::make('price')
-                    ->formatStateUsing(fn ($state): string => '₹' . number_format((float) $state, 2))
+                    ->formatStateUsing(fn ($state): string => '$' . number_format((float) $state, 2))
                     ->sortable(),
 
                 // Stock column with colour coding
