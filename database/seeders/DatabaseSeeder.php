@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'ancy@altawkelcenter.com'],
-            [
-                'name' => 'Admin',
-                'password' => bcrypt('password'),
-            ]
-        );
+       User::updateOrCreate(
+    ['email' => 'ancy@altawkelcenter.com'],
+    [
+        'name' => 'Admin',
+        'password' => 'password',
+    ]
+);
 
         $this->call([
             BrandSeeder::class,
