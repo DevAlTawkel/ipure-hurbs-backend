@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Inventory;
 use App\Models\Product;
 use App\Models\StockMovement;
 use BackedEnum;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;

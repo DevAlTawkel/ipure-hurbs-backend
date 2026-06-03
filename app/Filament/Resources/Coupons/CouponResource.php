@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Coupons;
 
 use App\Models\Coupon;
 use BackedEnum;
-use Filament\Forms\Components\DateTimePickerComponent;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -66,10 +66,10 @@ class CouponResource extends Resource
 
             Section::make('Validity & Limits')
                 ->schema([
-                    DateTimePickerComponent::make('valid_from')
+                    DateTimePicker::make('valid_from')
                         ->required(),
 
-                    DateTimePickerComponent::make('valid_until')
+                    DateTimePicker::make('valid_until')
                         ->helperText('Leave empty for no expiry'),
 
                     TextInput::make('usage_limit')
