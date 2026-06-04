@@ -98,12 +98,31 @@ class ProductController extends Controller
 
     /**
      * GET /api/products/{slug}
+     * Full product detail — includes variants, sections, images, reviews, related products.
      */
     public function show(Product $product): ProductResource
     {
         abort_unless($product->is_active, 404);
 
-        $product->load(['category', 'brand']);
+        $product->load([
+            'category',
+            'brand',
+            'images',
+            'variants'  => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'),
+            'sections'  => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'),
+            'reviews'   => fn ($q) => $q->with('customer:id,name')->latest()->limit(20),
+        ]);
+
+        // Attach related products as extra data
+        $product->setRelation('related', Product::query()
+            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->when($product->category_id, fn ($q) => $q->where('category_id', $product->category_id))
+            ->orderByDesc('sales_count')
+            ->limit(8)
+            ->get()
+        );
 
         return new ProductResource($product);
     }

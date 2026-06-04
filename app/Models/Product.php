@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ProductVariant;
+use App\Models\ProductSection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -34,6 +36,7 @@ class Product extends Model
         'is_trending',
         'seo_title',
         'seo_description',
+        'tags',
     ];
 
     protected function casts(): array
@@ -50,6 +53,7 @@ class Product extends Model
             'is_active'     => 'boolean',
             'is_featured'   => 'boolean',
             'is_trending'   => 'boolean',
+            'tags'          => 'array',
         ];
     }
 
@@ -89,6 +93,16 @@ public function wishlists(): HasMany
 public function stockMovements(): HasMany
 {
     return $this->hasMany(StockMovement::class)->orderByDesc('created_at');
+}
+
+public function variants(): HasMany
+{
+    return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+}
+
+public function sections(): HasMany
+{
+    return $this->hasMany(ProductSection::class)->where('is_active', true)->orderBy('sort_order');
 }
 
     public function imageUrl(): ?string
