@@ -12,7 +12,7 @@
 </head>
 <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
     <div class="bg-emerald-800 text-white text-center text-sm py-2 px-4">
-        Free shipping on orders over ₹599 · 100% Ayurvedic · Secure checkout
+        Free shipping on orders over $50 · 100% Ayurvedic · Secure checkout
     </div>
     <header class="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
@@ -60,7 +60,7 @@
                 </div>
                 <div>
                     <p class="font-medium">Support</p>
-                    <p class="mt-2 text-sm text-emerald-100">WhatsApp · Free shipping ₹599+ · Secure payment</p>
+                    <p class="mt-2 text-sm text-emerald-100">WhatsApp · Free shipping $50+ · Secure payment</p>
                 </div>
             </div>
             <p class="mt-8 border-t border-emerald-800 pt-6 text-center text-xs text-emerald-200">

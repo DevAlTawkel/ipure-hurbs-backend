@@ -54,7 +54,7 @@ class OrderResource extends Resource
                 TextColumn::make('order_number')->searchable()->copyable(),
                 TextColumn::make('shipping_name')->label('Customer')->searchable(),
                 TextColumn::make('total')
-                    ->formatStateUsing(fn ($state) => '₹' . number_format((float) $state, 2))
+                    ->formatStateUsing(fn ($state) => '$' . number_format((float) $state, 2))
                     ->sortable(),
                 TextColumn::make('status')
                     ->badge()

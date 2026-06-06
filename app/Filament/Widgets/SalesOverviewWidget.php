@@ -33,7 +33,7 @@ class SalesOverviewWidget extends StatsOverviewWidget
         )->values()->toArray();
 
         return [
-            Stat::make('Total Revenue', '₹' . number_format($totalRevenue, 2))
+            Stat::make('Total Revenue', '$' . number_format($totalRevenue, 2))
                 ->description('All paid orders')
                 ->descriptionColor('success')
                 ->chart($revenueTrend)
@@ -52,7 +52,7 @@ class SalesOverviewWidget extends StatsOverviewWidget
                 ->descriptionColor('info')
                 ->color('info'),
 
-            Stat::make('Avg Order Value', '₹' . number_format($avgOrderValue, 2))
+            Stat::make('Avg Order Value', '$' . number_format($avgOrderValue, 2))
                 ->description('Per paid order')
                 ->color('primary'),
 

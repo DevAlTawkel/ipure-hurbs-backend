@@ -19,7 +19,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 border border-gray-100 dark:border-gray-700">
             <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Total Revenue</p>
-            <p class="text-2xl font-bold text-green-600">₹{{ number_format($totalRevenue, 2) }}</p>
+            <p class="text-2xl font-bold text-green-600">${{ number_format($totalRevenue, 2) }}</p>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 border border-gray-100 dark:border-gray-700">
             <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Paid Orders</p>
@@ -27,11 +27,11 @@
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 border border-gray-100 dark:border-gray-700">
             <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Avg Order Value</p>
-            <p class="text-2xl font-bold text-blue-600">₹{{ number_format($avgOrderValue, 2) }}</p>
+            <p class="text-2xl font-bold text-blue-600">${{ number_format($avgOrderValue, 2) }}</p>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 border border-gray-100 dark:border-gray-700">
             <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Total Discount Given</p>
-            <p class="text-2xl font-bold text-red-500">₹{{ number_format($totalDiscount, 2) }}</p>
+            <p class="text-2xl font-bold text-red-500">${{ number_format($totalDiscount, 2) }}</p>
         </div>
     </div>
 
@@ -95,7 +95,7 @@
                                     @endif
                                 </td>
                                 <td class="py-2 text-right font-semibold">{{ $p->total_qty }}</td>
-                                <td class="py-2 text-right text-green-600">₹{{ number_format($p->total_revenue, 0) }}</td>
+                                <td class="py-2 text-right text-green-600">${{ number_format($p->total_revenue, 0) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -122,7 +122,7 @@
                         <tr class="border-b dark:border-gray-700 last:border-0">
                             <td class="py-2 text-gray-600 dark:text-gray-300">{{ $row['date'] }}</td>
                             <td class="py-2 text-right">{{ $row['orders'] }}</td>
-                            <td class="py-2 text-right font-semibold text-green-600">₹{{ number_format($row['revenue'], 2) }}</td>
+                            <td class="py-2 text-right font-semibold text-green-600">${{ number_format($row['revenue'], 2) }}</td>
                         </tr>
                         @endif
                     @endforeach
@@ -159,7 +159,7 @@
                                 <div class="text-xs text-gray-400">{{ $order->customerEmail() }}</div>
                             </td>
                             <td class="py-2 text-right">{{ $order->items->count() }}</td>
-                            <td class="py-2 text-right font-semibold text-green-600">₹{{ number_format($order->total, 2) }}</td>
+                            <td class="py-2 text-right font-semibold text-green-600">${{ number_format($order->total, 2) }}</td>
                             <td class="py-2 text-right text-gray-400">{{ $order->paid_at?->format('d M, H:i') }}</td>
                         </tr>
                     @empty
