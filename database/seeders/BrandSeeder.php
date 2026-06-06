@@ -10,13 +10,10 @@ class BrandSeeder extends Seeder
     public function run(): void
     {
         Brand::create([
-            'name' => 'Himalaya',
-            'slug' => 'himalaya',
-        ]);
-
-        Brand::create([
-            'name' => 'Dabur',
-            'slug' => 'dabur',
+            'name' => 'BioQem Pharma',
+            'slug' => 'bioqem-pharma',
+            'description' => 'Natural Ayurvedic and herbal health products.',
+            'is_active' => true,
         ]);
     }
 }
