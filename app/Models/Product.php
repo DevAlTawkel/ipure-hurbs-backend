@@ -37,6 +37,7 @@ class Product extends Model
         'seo_title',
         'seo_description',
         'tags',
+        'gallery',
     ];
 
     protected function casts(): array
@@ -54,6 +55,7 @@ class Product extends Model
             'is_featured'   => 'boolean',
             'is_trending'   => 'boolean',
             'tags'          => 'array',
+            'gallery'       => 'array',
         ];
     }
 

@@ -53,9 +53,20 @@ class ProductForm
                                     ->required(),
 
                                 FileUpload::make('image')
+                                    ->label('Main Image')
                                     ->image()
                                     ->disk('public')
                                     ->directory('products'),
+
+                                FileUpload::make('gallery')
+                                    ->label('Gallery Images (up to 4)')
+                                    ->image()
+                                    ->multiple()
+                                    ->maxFiles(4)
+                                    ->disk('public')
+                                    ->directory('products/gallery')
+                                    ->reorderable()
+                                    ->helperText('Upload up to 4 product images. These appear in the product image gallery.'),
                             ]),
 
                         Tabs\Tab::make('Pricing')

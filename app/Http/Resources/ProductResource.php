@@ -49,12 +49,13 @@ class ProductResource extends JsonResource
 
             // ── Media ────────────────────────────────────────────────────
             'image_url'           => $this->imageUrl(),
-            'images'              => $this->whenLoaded('images', fn () =>
-                $this->images->sortBy('sort_order')->values()->map(fn ($img) => [
-                    'id'  => $img->id,
-                    'url' => $img->url(),
+            'images'              => collect($this->gallery ?? [])
+                ->values()
+                ->map(fn ($path, $index) => [
+                    'id'  => $index + 1,
+                    'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($path),
                 ])
-            ),
+                ->values(),
 
             // ── Category & Brand ─────────────────────────────────────────
             'category'            => $this->whenLoaded('category', fn () => $this->category ? [

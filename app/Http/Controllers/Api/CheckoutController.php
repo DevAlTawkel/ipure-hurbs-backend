@@ -18,9 +18,10 @@ use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
-    const FIRST_ORDER_DISCOUNT    = 0.20;  // 20%
-    const FREE_SHIPPING_THRESHOLD = 50.00; // Free shipping on orders over $50
-    const SHIPPING_CHARGE         = 7.99;  // Flat $7.99 shipping
+    const FIRST_ORDER_DISCOUNT    = 0.20;   // 20%
+    const FREE_SHIPPING_THRESHOLD = 100.00; // Free standard shipping on orders over $100
+    const SHIPPING_CHARGE         = 30.00;  // Standard shipping under $100
+    const EXPRESS_SHIPPING        = 40.00;  // Express delivery always $40
 
     /**
      * POST /api/checkout/initiate
@@ -42,6 +43,7 @@ class CheckoutController extends Controller
             'guest_name'       => ['nullable', 'string'],
             'guest_phone'      => ['nullable', 'string'],
             'notes'            => ['nullable', 'string', 'max:500'],
+            'shipping_type'    => ['nullable', 'in:standard,express'],
         ]);
 
         $cart = Cart::findOrCreateForRequest($request);
@@ -65,8 +67,9 @@ class CheckoutController extends Controller
             }
         }
 
-        $subtotal = $cart->total();
-        $customer = $request->user('customer');
+        $subtotal      = $cart->total();
+        $customer      = $request->user('customer');
+        $shippingType  = $request->input('shipping_type', 'standard');
 
         // 20% first-order discount
         $discountAmount = 0;
@@ -77,9 +80,11 @@ class CheckoutController extends Controller
             $discountReason = '20% welcome discount on your first order';
         }
 
-        $afterDiscount   = $subtotal - $discountAmount;
-        $shippingCharge  = $afterDiscount >= self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::SHIPPING_CHARGE;
-        $total           = $afterDiscount + $shippingCharge;
+        $afterDiscount  = $subtotal - $discountAmount;
+        $shippingCharge = $shippingType === 'express'
+            ? self::EXPRESS_SHIPPING
+            : ($afterDiscount >= self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::SHIPPING_CHARGE);
+        $total          = $afterDiscount + $shippingCharge;
 
         // Create Stripe Payment Intent
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -98,11 +103,15 @@ class CheckoutController extends Controller
             'client_secret'    => $intent->client_secret,
             'payment_intent_id' => $intent->id,
             'pricing'          => [
-                'subtotal'        => $subtotal,
-                'discount_amount' => $discountAmount,
-                'discount_reason' => $discountReason,
-                'shipping_charge' => $shippingCharge,
-                'total'           => $total,
+                'subtotal'              => $subtotal,
+                'discount_amount'       => $discountAmount,
+                'discount_reason'       => $discountReason,
+                'shipping_type'         => $shippingType,
+                'shipping_charge'       => $shippingCharge,
+                'shipping_note'         => $shippingType === 'express'
+                    ? 'Express delivery: $40'
+                    : ($shippingCharge == 0 ? 'Free shipping on orders over $100' : 'Standard shipping: $30'),
+                'total'                 => $total,
             ],
         ]);
     }
@@ -127,6 +136,7 @@ class CheckoutController extends Controller
             'guest_name'        => ['nullable', 'string'],
             'guest_phone'       => ['nullable', 'string'],
             'notes'             => ['nullable', 'string'],
+            'shipping_type'     => ['nullable', 'in:standard,express'],
         ]);
 
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -150,9 +160,10 @@ class CheckoutController extends Controller
             return response()->json(['message' => 'Cart is empty.'], 422);
         }
 
-        $customer = $request->user('customer');
-        $addr     = $request->input('address');
-        $subtotal = $cart->total();
+        $customer     = $request->user('customer');
+        $addr         = $request->input('address');
+        $subtotal     = $cart->total();
+        $shippingType = $request->input('shipping_type', 'standard');
 
         $discountAmount = 0;
         $discountReason = null;
@@ -163,7 +174,9 @@ class CheckoutController extends Controller
         }
 
         $afterDiscount  = $subtotal - $discountAmount;
-        $shippingCharge = $afterDiscount >= self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::SHIPPING_CHARGE;
+        $shippingCharge = $shippingType === 'express'
+            ? self::EXPRESS_SHIPPING
+            : ($afterDiscount >= self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::SHIPPING_CHARGE);
         $total          = $afterDiscount + $shippingCharge;
 
         $order = DB::transaction(function () use (
