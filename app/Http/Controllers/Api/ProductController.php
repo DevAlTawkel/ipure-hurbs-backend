@@ -25,7 +25,7 @@ class ProductController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $products = Product::query()
-            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
             ->where('is_active', true)
 
             ->when($request->category, fn ($q, $slug) => $q->whereHas(
@@ -69,7 +69,7 @@ class ProductController extends Controller
     public function featured(): AnonymousResourceCollection
     {
         $products = Product::query()
-            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
             ->where('is_active', true)
             ->where('is_featured', true)
             ->latest()
@@ -86,7 +86,7 @@ class ProductController extends Controller
     public function trending(): AnonymousResourceCollection
     {
         $products = Product::query()
-            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
             ->where('is_active', true)
             ->where('is_trending', true)
             ->latest()
@@ -136,7 +136,7 @@ class ProductController extends Controller
         abort_unless($product->is_active, 404);
 
         $related = Product::query()
-            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
             ->where('is_active', true)
             ->where('id', '!=', $product->id)
             ->when($product->category_id, fn ($q) => $q->where('category_id', $product->category_id))

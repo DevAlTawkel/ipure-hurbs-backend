@@ -50,18 +50,11 @@ class ProductResource extends JsonResource
             // ── Media ────────────────────────────────────────────────────
             'image_url'           => $this->imageUrl(),
             'images'              => $this->whenLoaded('images', fn () =>
-                $this->images->map(fn ($img) => [
-                    'id'         => $img->id,
-                    'url'        => $img->url(),
-                    'is_primary' => (bool) $img->is_primary,
-                    'sort_order' => $img->sort_order,
+                $this->images->sortBy('sort_order')->values()->map(fn ($img) => [
+                    'id'  => $img->id,
+                    'url' => $img->url(),
                 ])
             ),
-            ...($this->relationLoaded('images')
-                ? $this->images->sortBy('sort_order')->values()
-                    ->mapWithKeys(fn ($img, $i) => ['image' . ($i + 1) => $img->url()])
-                    ->toArray()
-                : []),
 
             // ── Category & Brand ─────────────────────────────────────────
             'category'            => $this->whenLoaded('category', fn () => $this->category ? [
