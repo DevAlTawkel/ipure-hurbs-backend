@@ -11,6 +11,12 @@ return [
         'http://127.0.0.1:3000',
         'https://ipureherbs.org',
         'https://www.ipureherbs.org',
+        'https://staging.ipure-hurbs-frontend.pages.dev',
+        'https://ipure-hurbs-frontend.pages.dev',
+    ],
+
+    'allowed_origins_patterns' => [
+        '#^https://.*\.ipure-hurbs-frontend\.pages\.dev$#',
     ],
 
     'allowed_headers' => ['*'],
