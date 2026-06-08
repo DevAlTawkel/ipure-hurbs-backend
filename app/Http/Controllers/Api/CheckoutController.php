@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Mail\OrderPlacedMail;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Order;
@@ -11,14 +12,15 @@ use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
-    const FIRST_ORDER_DISCOUNT = 0.20; // 20%
-    const FREE_SHIPPING_THRESHOLD = 500.00;
-    const SHIPPING_CHARGE = 60.00;
+    const FIRST_ORDER_DISCOUNT    = 0.20;  // 20%
+    const FREE_SHIPPING_THRESHOLD = 50.00; // Free shipping on orders over $50
+    const SHIPPING_CHARGE         = 7.99;  // Flat $7.99 shipping
 
     /**
      * POST /api/checkout/initiate
@@ -83,8 +85,8 @@ class CheckoutController extends Controller
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $intent = PaymentIntent::create([
-            'amount'   => (int) round($total * 100), // paise
-            'currency' => 'inr',
+            'amount'   => (int) round($total * 100), // cents
+            'currency' => 'usd',
             'metadata' => [
                 'cart_id'       => $cart->id,
                 'customer_id'   => $customer?->id,
@@ -223,6 +225,11 @@ class CheckoutController extends Controller
         });
 
         $order->load('items');
+
+        $emailTo = $customer?->email ?? $request->guest_email;
+        if ($emailTo) {
+            Mail::to($emailTo)->queue(new OrderPlacedMail($order));
+        }
 
         return response()->json(['data' => new OrderResource($order)], 201);
     }

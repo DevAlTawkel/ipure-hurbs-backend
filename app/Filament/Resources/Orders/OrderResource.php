@@ -4,7 +4,10 @@ namespace App\Filament\Resources\Orders;
 
 use App\Filament\Resources\Orders\Pages\ListOrders;
 use App\Filament\Resources\Orders\Pages\ViewOrder;
+use App\Mail\OrderDeliveredMail;
+use App\Mail\OrderShippedMail;
 use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
 use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -129,11 +132,11 @@ class OrderResource extends Resource
 
             Section::make('Pricing')
                 ->schema([
-                    TextEntry::make('subtotal')->money('INR'),
-                    TextEntry::make('discount_amount')->money('INR'),
+                    TextEntry::make('subtotal')->money('USD'),
+                    TextEntry::make('discount_amount')->money('USD'),
                     TextEntry::make('discount_reason'),
-                    TextEntry::make('shipping_charge')->money('INR'),
-                    TextEntry::make('total')->money('INR'),
+                    TextEntry::make('shipping_charge')->money('USD'),
+                    TextEntry::make('total')->money('USD'),
                 ])->columns(3),
         ]);
     }

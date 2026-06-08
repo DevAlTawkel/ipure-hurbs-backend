@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\CustomerResource;
+use App\Mail\WelcomeMail;
 use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -25,6 +27,8 @@ class CustomerAuthController extends Controller
         ]);
 
         $customer = Customer::create($data);
+
+        Mail::to($customer->email)->queue(new WelcomeMail($customer));
 
         $token = $customer->createToken('customer-app')->plainTextToken;
 
