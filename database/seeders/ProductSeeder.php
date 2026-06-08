@@ -11,7 +11,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $brandId = Brand::where('slug', 'ipure-herbs')->value('id') ?? 1;
+        $brandId = Brand::where('slug', 'bioqem-pharma')->value('id') ?? 1;
         $cat = fn(string $slug) => Category::where('slug', $slug)->value('id');
 
         $products = [
