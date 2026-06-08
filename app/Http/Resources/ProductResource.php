@@ -57,6 +57,11 @@ class ProductResource extends JsonResource
                     'sort_order' => $img->sort_order,
                 ])
             ),
+            ...($this->relationLoaded('images')
+                ? $this->images->sortBy('sort_order')->values()
+                    ->mapWithKeys(fn ($img, $i) => ['image' . ($i + 1) => $img->url()])
+                    ->toArray()
+                : []),
 
             // ── Category & Brand ─────────────────────────────────────────
             'category'            => $this->whenLoaded('category', fn () => $this->category ? [

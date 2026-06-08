@@ -29,7 +29,7 @@ class HomeController extends Controller
             ->get();
 
         $base = Product::query()
-            ->with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
             ->where('is_active', true);
 
         $featuredProducts  = (clone $base)->where('is_featured', true)->latest()->limit(8)->get();

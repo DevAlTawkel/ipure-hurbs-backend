@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Home ────────────────────────────────────────────────────────────────────
 Route::get('/home', HomeController::class);
+Route::get('/home/home', HomeController::class); // alias for frontend
 
 // ─── Products ────────────────────────────────────────────────────────────────
 Route::prefix('products')->group(function () {
