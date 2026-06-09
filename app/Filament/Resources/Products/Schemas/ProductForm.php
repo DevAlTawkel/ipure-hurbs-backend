@@ -141,8 +141,10 @@ class ProductForm
                                             ->placeholder('e.g. 60ml, 100g, Small'),
 
                                         TextInput::make('sku')
-                                            ->label('SKU')
-                                            ->maxLength(100),
+                                            ->label('SKU (Optional)')
+                                            ->maxLength(100)
+                                            ->placeholder('e.g. PROD-500G')
+                                            ->helperText('Leave blank if not needed'),
 
                                         TextInput::make('price')
                                             ->label('Price ($)')
