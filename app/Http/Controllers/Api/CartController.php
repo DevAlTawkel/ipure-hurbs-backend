@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class CartController extends Controller
     public function show(Request $request): JsonResponse
     {
         $cart = Cart::findOrCreateForRequest($request);
-        $cart->load(['items.product']);
+        $cart->load(['items.product', 'items.variant']);
 
         return response()->json([
             'data' => new CartResource($cart),
@@ -25,6 +26,7 @@ class CartController extends Controller
     {
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
+            'variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
             'qty'        => ['integer', 'min:1', 'max:100'],
         ]);
 
@@ -32,39 +34,57 @@ class CartController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        if ($product->stock < 1) {
+        $variant   = null;
+        $variantId = $data['variant_id'] ?? null;
+        $price     = $product->price;
+        $stock     = $product->stock;
+
+        if ($variantId) {
+            $variant = ProductVariant::where('id', $variantId)
+                ->where('product_id', $product->id)
+                ->where('is_active', true)
+                ->firstOrFail();
+            $price = $variant->sale_price ?? $variant->price;
+            $stock = $variant->stock;
+        }
+
+        if ($stock < 1) {
             return response()->json(['message' => 'Product is out of stock.'], 422);
         }
 
         $qty = $data['qty'] ?? 1;
 
-        if ($qty > $product->stock) {
+        if ($qty > $stock) {
             return response()->json([
-                'message' => "Only {$product->stock} unit(s) available.",
+                'message' => "Only {$stock} unit(s) available.",
             ], 422);
         }
 
         $cart = Cart::findOrCreateForRequest($request);
 
-        $existing = $cart->items()->where('product_id', $product->id)->first();
+        $existing = $cart->items()
+            ->where('product_id', $product->id)
+            ->where('variant_id', $variantId)
+            ->first();
 
         if ($existing) {
             $newQty = $existing->qty + $qty;
-            if ($newQty > $product->stock) {
+            if ($newQty > $stock) {
                 return response()->json([
-                    'message' => "Cannot add more. Only {$product->stock} unit(s) available.",
+                    'message' => "Cannot add more. Only {$stock} unit(s) available.",
                 ], 422);
             }
             $existing->update(['qty' => $newQty]);
         } else {
             $cart->items()->create([
                 'product_id'   => $product->id,
+                'variant_id'   => $variantId,
                 'qty'          => $qty,
-                'price_at_add' => $product->price,
+                'price_at_add' => $price,
             ]);
         }
 
-        $cart->load(['items.product']);
+        $cart->load(['items.product', 'items.variant']);
 
         return response()->json([
             'message'    => 'Item added to cart.',
@@ -89,7 +109,7 @@ class CartController extends Controller
         }
 
         $item->update(['qty' => $data['qty']]);
-        $cart->load(['items.product']);
+        $cart->load(['items.product', 'items.variant']);
 
         return response()->json(['data' => new CartResource($cart)]);
     }
@@ -98,7 +118,7 @@ class CartController extends Controller
     {
         $cart = Cart::findOrCreateForRequest($request);
         $cart->items()->findOrFail($itemId)->delete();
-        $cart->load(['items.product']);
+        $cart->load(['items.product', 'items.variant']);
 
         return response()->json(['data' => new CartResource($cart)]);
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CartItem extends Model
@@ -10,6 +11,7 @@ class CartItem extends Model
     protected $fillable = [
         'cart_id',
         'product_id',
+        'variant_id',
         'qty',
         'price_at_add',
     ];
@@ -30,6 +32,11 @@ class CartItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class);
     }
 
     public function subtotal(): float

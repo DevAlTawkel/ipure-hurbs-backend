@@ -24,6 +24,14 @@ class CartItemResource extends JsonResource
                 'in_stock'  => $this->product->inStock(),
                 'stock'     => $this->product->stock,
             ]),
+            'variant'      => $this->whenLoaded('variant', fn () => $this->variant ? [
+                'id'       => $this->variant->id,
+                'name'     => $this->variant->name,
+                'sku'      => $this->variant->sku,
+                'price'    => (float) $this->variant->price,
+                'in_stock' => $this->variant->inStock(),
+                'stock'    => $this->variant->stock,
+            ] : null),
         ];
     }
 }

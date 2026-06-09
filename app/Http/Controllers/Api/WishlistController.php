@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Wishlist;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -20,11 +21,13 @@ class WishlistController extends Controller
         }
 
         $wishlists = $customer->wishlists()
-            ->with('product')
+            ->with(['product.category:id,name,slug', 'product.brand:id,name,slug'])
             ->paginate(15);
 
+        $products = $wishlists->getCollection()->map(fn ($w) => $w->product)->filter();
+
         return response()->json([
-            'data' => $wishlists->items(),
+            'data' => ProductResource::collection($products)->resolve(),
             'pagination' => [
                 'total' => $wishlists->total(),
                 'per_page' => $wishlists->perPage(),
@@ -48,16 +51,17 @@ class WishlistController extends Controller
             'product_id' => 'required|exists:products,id',
         ]);
 
-        $wishlist = Wishlist::updateOrCreate(
-            [
-                'customer_id' => $customer->id,
-                'product_id' => $request->product_id,
-            ]
-        );
+        Wishlist::updateOrCreate([
+            'customer_id' => $customer->id,
+            'product_id' => $request->product_id,
+        ]);
+
+        $product = Product::with(['category:id,name,slug', 'brand:id,name,slug'])
+            ->find($request->product_id);
 
         return response()->json([
             'message' => 'Product added to wishlist',
-            'data' => $wishlist->load('product'),
+            'data' => new ProductResource($product),
         ], 201);
     }
 
