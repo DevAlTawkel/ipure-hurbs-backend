@@ -106,9 +106,9 @@ class ProductResource extends JsonResource
 
             // ── Reviews ──────────────────────────────────────────────────
             'reviews'             => $this->whenLoaded('reviews', fn () => [
-                'average'    => (float) $this->rating,
-                'total'      => (int) $this->review_count,
-                'items'      => $this->reviews->map(fn ($r) => [
+                'average' => (float) $this->rating,
+                'total'   => (int) $this->review_count,
+                'data'    => $this->reviews->map(fn ($r) => [
                     'id'                   => $r->id,
                     'rating'               => (int) $r->rating,
                     'title'                => $r->title,
@@ -116,7 +116,7 @@ class ProductResource extends JsonResource
                     'is_verified_purchase' => (bool) $r->is_verified_purchase,
                     'reviewer_name'        => $r->customer?->name ?? 'Anonymous',
                     'created_at'           => $r->created_at->toDateString(),
-                ]),
+                ])->values(),
             ]),
 
             // ── Related / Recommended Products ───────────────────────────

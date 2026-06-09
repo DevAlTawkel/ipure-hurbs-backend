@@ -24,7 +24,17 @@ class ReviewController extends Controller
             ->latest()
             ->paginate(10);
 
-        return response()->json(ReviewResource::collection($reviews)->response()->getData(true));
+        return response()->json([
+            'data'    => ReviewResource::collection($reviews->items())->resolve(),
+            'average' => (float) $product->rating,
+            'total'   => (int) $product->review_count,
+            'pagination' => [
+                'current_page' => $reviews->currentPage(),
+                'last_page'    => $reviews->lastPage(),
+                'per_page'     => $reviews->perPage(),
+                'total'        => $reviews->total(),
+            ],
+        ]);
     }
 
     /**
