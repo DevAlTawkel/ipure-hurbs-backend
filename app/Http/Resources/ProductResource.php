@@ -57,6 +57,16 @@ class ProductResource extends JsonResource
                 ])
                 ->values(),
 
+            // ── Additional Info ──────────────────────────────────────────
+            'additional_info'     => [
+                'key_herbal_ingredients' => $this->key_herbal_ingredients ?? [],
+                'key_benefits'           => $this->key_benefits ?? [],
+                'specifications'         => $this->specifications ?? [],
+                'indications'            => $this->indications ?? [],
+                'allergen_info'          => $this->allergen_info,
+                'other_ingredients'      => $this->other_ingredients,
+            ],
+
             // ── Category & Brand ─────────────────────────────────────────
             'category'            => $this->whenLoaded('category', fn () => $this->category ? [
                 'id'   => $this->category->id,

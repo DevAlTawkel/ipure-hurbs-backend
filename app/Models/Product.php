@@ -38,6 +38,12 @@ class Product extends Model
         'seo_description',
         'tags',
         'gallery',
+        'key_herbal_ingredients',
+        'key_benefits',
+        'specifications',
+        'indications',
+        'allergen_info',
+        'other_ingredients',
     ];
 
     protected function casts(): array
@@ -54,8 +60,12 @@ class Product extends Model
             'is_active'     => 'boolean',
             'is_featured'   => 'boolean',
             'is_trending'   => 'boolean',
-            'tags'          => 'array',
-            'gallery'       => 'array',
+            'tags'                   => 'array',
+            'gallery'                => 'array',
+            'key_herbal_ingredients' => 'array',
+            'key_benefits'           => 'array',
+            'specifications'         => 'array',
+            'indications'            => 'array',
         ];
     }
 

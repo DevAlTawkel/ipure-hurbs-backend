@@ -185,6 +185,67 @@ class ProductForm
                                     ->helperText('Add size-based pricing variants. The selected variant price overrides the product price in the cart.'),
                             ]),
 
+                        Tabs\Tab::make('Additional Info')
+                            ->schema([
+                                Repeater::make('key_herbal_ingredients')
+                                    ->label('Key Herbal Ingredients')
+                                    ->simple(
+                                        TextInput::make('ingredient')
+                                            ->placeholder('e.g. Korean Red Ginseng')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Ingredient')
+                                    ->columnSpanFull(),
+
+                                Repeater::make('key_benefits')
+                                    ->label('Key Benefits')
+                                    ->simple(
+                                        TextInput::make('benefit')
+                                            ->placeholder('e.g. Supports energy and stamina')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Benefit')
+                                    ->columnSpanFull(),
+
+                                Repeater::make('specifications')
+                                    ->label('Specifications')
+                                    ->schema([
+                                        TextInput::make('label')
+                                            ->label('Property')
+                                            ->required()
+                                            ->placeholder('e.g. Form, Serving Size'),
+                                        TextInput::make('value')
+                                            ->label('Value')
+                                            ->required()
+                                            ->placeholder('e.g. Herbal Powder, 5 gm'),
+                                    ])
+                                    ->columns(2)
+                                    ->addActionLabel('Add Specification')
+                                    ->columnSpanFull(),
+
+                                Repeater::make('indications')
+                                    ->label('Indications')
+                                    ->simple(
+                                        TextInput::make('indication')
+                                            ->placeholder('e.g. Male vitality')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Indication')
+                                    ->columnSpanFull(),
+
+                                Textarea::make('allergen_info')
+                                    ->label('Allergen Information')
+                                    ->placeholder('e.g. Manufactured in a facility that may process nuts, dairy...')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+
+                                Textarea::make('other_ingredients')
+                                    ->label('Other Ingredients')
+                                    ->placeholder('e.g. Natural herbal extracts, botanical ingredients...')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                            ]),
+
                         Tabs\Tab::make('SEO & Settings')
                             ->schema([
                                 TextInput::make('seo_title')
