@@ -71,22 +71,24 @@ class ProductResource extends JsonResource
             ] : null),
 
             // ── Size / Price Variants ────────────────────────────────────
-            // Only included on the detail page response (when variants are loaded)
+            // Only included on the detail page response (when variants are loaded).
+            // Pass variant_id to POST /api/cart when adding a sized product.
             'variants'            => $this->whenLoaded('variants', fn () =>
                 $this->variants->map(fn ($v) => [
-                    'id'                  => $v->id,
+                    'variant_id'          => $v->id,
                     'name'                => $v->name,
                     'sku'                 => $v->sku,
                     'price'               => (float) $v->price,
                     'compare_price'       => $v->compare_price ? (float) $v->compare_price : null,
                     'sale_price'          => $v->sale_price    ? (float) $v->sale_price    : null,
-                    'formatted_price'     => '$' . number_format((float) $v->price, 2),
+                    'effective_price'     => (float) ($v->sale_price ?? $v->price),
+                    'formatted_price'     => '$' . number_format((float) ($v->sale_price ?? $v->price), 2),
                     'has_discount'        => $v->hasDiscount(),
                     'discount_percentage' => $v->discountPercentage(),
                     'stock'               => (int) $v->stock,
                     'in_stock'            => $v->inStock(),
                     'is_default'          => (bool) $v->is_default,
-                ])
+                ])->values()
             ),
 
             // ── 9 Content Sections ────────────────────────────────────────
