@@ -8,9 +8,11 @@ return [
 
     'allowed_origins' => [
         'http://localhost:3000',
+        'http://localhost:5173',
         'http://127.0.0.1:3000',
         'https://ipureherbs.org',
         'https://www.ipureherbs.org',
+        'https://api.ipureherbs.org',
         'https://staging.ipure-hurbs-frontend.pages.dev',
         'https://ipure-hurbs-frontend.pages.dev',
     ],
