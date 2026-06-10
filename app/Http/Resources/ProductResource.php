@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +11,13 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         $isDetail = $this->relationLoaded('variants') || $this->relationLoaded('sections');
+
+        // Detect requested currency from X-Currency header or ?currency= param
+        $currencyCode = strtoupper(
+            $request->header('X-Currency') ?? $request->query('currency', 'USD')
+        );
+        $fx = app(CurrencyService::class);
+        $showLocal = $currencyCode !== 'USD';
 
         return [
             // ── Identity ──────────────────────────────────────────────────
@@ -24,13 +32,22 @@ class ProductResource extends JsonResource
             'short_description'   => $this->short_description,
             'description'         => $this->description,
 
-            // ── Pricing ──────────────────────────────────────────────────
+            // ── Pricing (USD base) ───────────────────────────────────────
             'price'               => (float) $this->price,
             'compare_price'       => $this->compare_price ? (float) $this->compare_price : null,
             'sale_price'          => $this->sale_price   ? (float) $this->sale_price   : null,
             'formatted_price'     => $this->formattedPrice(),
             'has_discount'        => $this->hasDiscount(),
             'discount_percentage' => $this->discountPercentage(),
+
+            // ── Local Currency Pricing ───────────────────────────────────
+            'currency'            => $currencyCode,
+            'local_price'         => $fx->convert((float) $this->price, $currencyCode),
+            'local_compare_price' => $this->compare_price
+                ? $fx->convert((float) $this->compare_price, $currencyCode) : null,
+            'local_sale_price'    => $this->sale_price
+                ? $fx->convert((float) $this->sale_price, $currencyCode) : null,
+            'local_formatted_price' => $fx->format((float) $this->price, $currencyCode),
 
             // ── Ratings & Sales ──────────────────────────────────────────
             'rating'              => (float) $this->rating,
@@ -91,13 +108,16 @@ class ProductResource extends JsonResource
                     'price'               => (float) $v->price,
                     'compare_price'       => $v->compare_price ? (float) $v->compare_price : null,
                     'sale_price'          => $v->sale_price    ? (float) $v->sale_price    : null,
-                    'effective_price'     => (float) ($v->sale_price ?? $v->price),
-                    'formatted_price'     => '$' . number_format((float) ($v->sale_price ?? $v->price), 2),
-                    'has_discount'        => $v->hasDiscount(),
-                    'discount_percentage' => $v->discountPercentage(),
-                    'stock'               => (int) $v->stock,
-                    'in_stock'            => $v->inStock(),
-                    'is_default'          => (bool) $v->is_default,
+                    'effective_price'       => (float) ($v->sale_price ?? $v->price),
+                    'formatted_price'       => '$' . number_format((float) ($v->sale_price ?? $v->price), 2),
+                    'local_price'           => $fx->convert((float) $v->price, $currencyCode),
+                    'local_effective_price' => $fx->convert((float) ($v->sale_price ?? $v->price), $currencyCode),
+                    'local_formatted_price' => $fx->format((float) ($v->sale_price ?? $v->price), $currencyCode),
+                    'has_discount'          => $v->hasDiscount(),
+                    'discount_percentage'   => $v->discountPercentage(),
+                    'stock'                 => (int) $v->stock,
+                    'in_stock'              => $v->inStock(),
+                    'is_default'            => (bool) $v->is_default,
                 ])->values()
             ),
 

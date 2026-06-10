@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\CustomerAuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CouponController;
@@ -14,6 +15,10 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
+
+// ─── Currency Detection ───────────────────────────────────────────────────────
+Route::get('/currency', [CurrencyController::class, 'detect']);
+Route::get('/currency/list', [CurrencyController::class, 'list']);
 
 // ─── Home ────────────────────────────────────────────────────────────────────
 Route::get('/home', HomeController::class);
