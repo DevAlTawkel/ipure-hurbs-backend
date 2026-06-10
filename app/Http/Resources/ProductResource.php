@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Services\CurrencyService;
+use App\Services\GeoLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,15 +13,19 @@ class ProductResource extends JsonResource
     {
         $isDetail = $this->relationLoaded('variants') || $this->relationLoaded('sections');
 
-        // Currency: X-Currency header OR ?currency= param, default USD
-        $code = strtoupper(
-            $request->header('X-Currency') ?? $request->query('currency', 'USD')
-        );
         $fx = app(CurrencyService::class);
 
-        // Resolve to a known currency (fallback to USD if unknown code sent)
-        $currencyInfo = $fx->forCode($code);
-        $code         = $currencyInfo['code'];
+        // Priority: 1) X-Currency header  2) ?currency= param  3) auto-detect from IP
+        $explicit = $request->header('X-Currency') ?? $request->query('currency');
+
+        if ($explicit) {
+            $currencyInfo = $fx->forCode(strtoupper($explicit));
+        } else {
+            $geo          = app(GeoLocationService::class)->detect($request->ip());
+            $currencyInfo = $fx->forCountry($geo['country_code']);
+        }
+
+        $code = $currencyInfo['code'];
 
         return [
             // ── Identity ──────────────────────────────────────────────────
