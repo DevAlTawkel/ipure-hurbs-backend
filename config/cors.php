@@ -13,6 +13,7 @@ return [
         'https://ipureherbs.org',
         'https://www.ipureherbs.org',
         'https://api.ipureherbs.org',
+        'https://staging.ipureherbs.org',
         'https://staging.ipure-hurbs-frontend.pages.dev',
         'https://ipure-hurbs-frontend.pages.dev',
     ],
