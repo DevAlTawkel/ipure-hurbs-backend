@@ -271,20 +271,18 @@ class ProductSeeder extends Seeder
                 ])
             );
 
-            // Delete old variants and recreate
-            $product->variants()->delete();
-
             foreach ($variantNames as $index => $variantName) {
-                ProductVariant::create([
-                    'product_id' => $product->id,
-                    'name'       => $variantName,
-                    'sku'        => null,
-                    'price'      => $data['price'],
-                    'stock'      => intval($data['stock'] / max(count($variantNames), 1)),
-                    'is_default' => $index === 0,
-                    'is_active'  => true,
-                    'sort_order' => $index,
-                ]);
+                ProductVariant::updateOrCreate(
+                    ['product_id' => $product->id, 'name' => $variantName],
+                    [
+                        'sku'        => null,
+                        'price'      => $data['price'],
+                        'stock'      => intval($data['stock'] / max(count($variantNames), 1)),
+                        'is_default' => $index === 0,
+                        'is_active'  => true,
+                        'sort_order' => $index,
+                    ]
+                );
             }
         }
     }
