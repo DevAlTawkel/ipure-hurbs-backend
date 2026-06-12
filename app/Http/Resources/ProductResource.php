@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Services\CurrencyService;
+use App\Services\GeoLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +12,20 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         $isDetail = $this->relationLoaded('variants') || $this->relationLoaded('sections');
+
+        $fx = app(CurrencyService::class);
+
+        // Priority: 1) X-Currency header  2) ?currency= param  3) auto-detect from IP
+        $explicit = $request->header('X-Currency') ?? $request->query('currency');
+
+        if ($explicit) {
+            $currencyInfo = $fx->forCode(strtoupper($explicit));
+        } else {
+            $geo          = app(GeoLocationService::class)->detect($request->ip());
+            $currencyInfo = $fx->forCountry($geo['country_code']);
+        }
+
+        $code = $currencyInfo['code'];
 
         return [
             // ── Identity ──────────────────────────────────────────────────
@@ -24,11 +40,16 @@ class ProductResource extends JsonResource
             'short_description'   => $this->short_description,
             'description'         => $this->description,
 
-            // ── Pricing ──────────────────────────────────────────────────
-            'price'               => (float) $this->price,
-            'compare_price'       => $this->compare_price ? (float) $this->compare_price : null,
-            'sale_price'          => $this->sale_price   ? (float) $this->sale_price   : null,
-            'formatted_price'     => $this->formattedPrice(),
+            // ── Pricing (converted to requested currency) ─────────────────
+            'currency'            => $code,
+            'currency_symbol'     => $currencyInfo['symbol'],
+            'price_usd'           => (float) $this->price,          // always USD, used for Stripe checkout
+            'price'               => $fx->convert((float) $this->price, $code),
+            'compare_price'       => $this->compare_price
+                                        ? $fx->convert((float) $this->compare_price, $code) : null,
+            'sale_price'          => $this->sale_price
+                                        ? $fx->convert((float) $this->sale_price, $code) : null,
+            'formatted_price'     => $fx->format((float) $this->price, $code),
             'has_discount'        => $this->hasDiscount(),
             'discount_percentage' => $this->discountPercentage(),
 
@@ -81,18 +102,19 @@ class ProductResource extends JsonResource
             ] : null),
 
             // ── Size / Price Variants ────────────────────────────────────
-            // Only included on the detail page response (when variants are loaded).
-            // Pass variant_id to POST /api/cart when adding a sized product.
             'variants'            => $this->whenLoaded('variants', fn () =>
                 $this->variants->map(fn ($v) => [
                     'variant_id'          => $v->id,
                     'name'                => $v->name,
                     'sku'                 => $v->sku,
-                    'price'               => (float) $v->price,
-                    'compare_price'       => $v->compare_price ? (float) $v->compare_price : null,
-                    'sale_price'          => $v->sale_price    ? (float) $v->sale_price    : null,
-                    'effective_price'     => (float) ($v->sale_price ?? $v->price),
-                    'formatted_price'     => '$' . number_format((float) ($v->sale_price ?? $v->price), 2),
+                    'price_usd'           => (float) $v->price,
+                    'price'               => $fx->convert((float) $v->price, $code),
+                    'compare_price'       => $v->compare_price
+                                                ? $fx->convert((float) $v->compare_price, $code) : null,
+                    'sale_price'          => $v->sale_price
+                                                ? $fx->convert((float) $v->sale_price, $code) : null,
+                    'effective_price'     => $fx->convert((float) ($v->sale_price ?? $v->price), $code),
+                    'formatted_price'     => $fx->format((float) ($v->sale_price ?? $v->price), $code),
                     'has_discount'        => $v->hasDiscount(),
                     'discount_percentage' => $v->discountPercentage(),
                     'stock'               => (int) $v->stock,
@@ -101,11 +123,7 @@ class ProductResource extends JsonResource
                 ])->values()
             ),
 
-            // ── 9 Content Sections ────────────────────────────────────────
-            // Matches the product detail page tabs:
-            // Description · Key Benefits · Active Ingredients ·
-            // Natural Essential Benefits · Application · FDA Regulations ·
-            // Suggested Use · Supplement Facts · Allergen & Warnings
+            // ── Content Sections ──────────────────────────────────────────
             'sections'            => $this->whenLoaded('sections', fn () =>
                 $this->sections->map(fn ($s) => [
                     'id'           => $s->id,
@@ -131,16 +149,19 @@ class ProductResource extends JsonResource
                 ])->values(),
             ]),
 
-            // ── Related / Recommended Products ───────────────────────────
+            // ── Related Products ─────────────────────────────────────────
             'related_products'    => $this->whenLoaded('related', fn () =>
                 $this->related->map(fn ($p) => [
                     'id'                  => $p->id,
                     'name'                => $p->name,
                     'slug'                => $p->slug,
-                    'price'               => (float) $p->price,
-                    'compare_price'       => $p->compare_price ? (float) $p->compare_price : null,
-                    'sale_price'          => $p->sale_price    ? (float) $p->sale_price    : null,
-                    'formatted_price'     => '$' . number_format((float) $p->price, 2),
+                    'price_usd'           => (float) $p->price,
+                    'price'               => $fx->convert((float) $p->price, $code),
+                    'compare_price'       => $p->compare_price
+                                                ? $fx->convert((float) $p->compare_price, $code) : null,
+                    'sale_price'          => $p->sale_price
+                                                ? $fx->convert((float) $p->sale_price, $code) : null,
+                    'formatted_price'     => $fx->format((float) $p->price, $code),
                     'has_discount'        => $p->hasDiscount(),
                     'discount_percentage' => $p->discountPercentage(),
                     'rating'              => (float) $p->rating,
