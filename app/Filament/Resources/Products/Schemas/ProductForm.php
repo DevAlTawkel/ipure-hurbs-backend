@@ -209,22 +209,17 @@ class ProductForm
 
                                 Repeater::make('specifications')
                                     ->label('Specifications')
-                                    ->schema([
-                                        TextInput::make('label')
-                                            ->label('Property')
+                                    ->simple(
+                                        TextInput::make('specification')
+                                            ->placeholder('e.g. Herbal, Serve: 5gm, Store: Cool & Dry')
                                             ->required()
-                                            ->placeholder('e.g. Form, Serving Size'),
-                                        TextInput::make('value')
-                                            ->label('Value')
-                                            ->required()
-                                            ->placeholder('e.g. Herbal Powder, 5 gm'),
-                                    ])
-                                    ->columns(2)
+                                    )
                                     ->addActionLabel('Add Specification')
                                     ->columnSpanFull(),
 
                                 Repeater::make('indications')
                                     ->label('Indications')
+                                    ->helperText('e.g. Traditionally used for support: male vitality, general wellness')
                                     ->simple(
                                         TextInput::make('indication')
                                             ->placeholder('e.g. Male vitality')
@@ -233,10 +228,34 @@ class ProductForm
                                     ->addActionLabel('Add Indication')
                                     ->columnSpanFull(),
 
-                                Textarea::make('allergen_info')
-                                    ->label('Allergen Information')
-                                    ->placeholder('e.g. Manufactured in a facility that may process nuts, dairy...')
-                                    ->rows(3)
+                                Repeater::make('supplement_facts')
+                                    ->label('Supplement Facts')
+                                    ->simple(
+                                        TextInput::make('fact')
+                                            ->placeholder('e.g. Serving: 5 gm (1 spoon)')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Supplement Fact')
+                                    ->columnSpanFull(),
+
+                                Repeater::make('suggested_use')
+                                    ->label('Suggested Use')
+                                    ->simple(
+                                        TextInput::make('step')
+                                            ->placeholder('e.g. Mix it well with milk or water')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Step')
+                                    ->columnSpanFull(),
+
+                                Repeater::make('warnings')
+                                    ->label('Warnings')
+                                    ->simple(
+                                        TextInput::make('warning')
+                                            ->placeholder('e.g. Read carefully before use')
+                                            ->required()
+                                    )
+                                    ->addActionLabel('Add Warning')
                                     ->columnSpanFull(),
 
                                 Textarea::make('other_ingredients')

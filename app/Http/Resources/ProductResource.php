@@ -84,7 +84,9 @@ class ProductResource extends JsonResource
                 'key_benefits'           => $this->key_benefits ?? [],
                 'specifications'         => $this->specifications ?? [],
                 'indications'            => $this->indications ?? [],
-                'allergen_info'          => $this->allergen_info,
+                'supplement_facts'       => $this->supplement_facts ?? [],
+                'suggested_use'          => $this->suggested_use ?? [],
+                'warnings'               => $this->warnings ?? [],
                 'other_ingredients'      => $this->other_ingredients,
             ],
 

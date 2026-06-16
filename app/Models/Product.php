@@ -42,6 +42,9 @@ class Product extends Model
         'key_benefits',
         'specifications',
         'indications',
+        'supplement_facts',
+        'suggested_use',
+        'warnings',
         'allergen_info',
         'other_ingredients',
     ];
@@ -66,6 +69,9 @@ class Product extends Model
             'key_benefits'           => 'array',
             'specifications'         => 'array',
             'indications'            => 'array',
+            'supplement_facts'       => 'array',
+            'suggested_use'          => 'array',
+            'warnings'               => 'array',
         ];
     }
 
