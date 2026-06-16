@@ -47,7 +47,6 @@ class ProductForm
                                     ->searchable(),
 
                                 Textarea::make('short_description')
-                                    ->maxLength(500)
                                     ->columnSpanFull(),
 
                                 Textarea::make('description')
