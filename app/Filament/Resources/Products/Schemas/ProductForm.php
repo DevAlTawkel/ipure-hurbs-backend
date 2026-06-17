@@ -24,6 +24,12 @@ class ProductForm
                     ->tabs([
                         Tabs\Tab::make('Basic Information')
                             ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Published')
+                                    ->helperText('Turn off to hide this product from the website')
+                                    ->default(true)
+                                    ->columnSpanFull(),
+
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
@@ -273,9 +279,6 @@ class ProductForm
                                 Textarea::make('seo_description')
                                     ->maxLength(500)
                                     ->label('SEO Description'),
-
-                                Toggle::make('is_active')
-                                    ->default(true),
 
                                 Toggle::make('is_featured')
                                     ->label('Featured Product'),

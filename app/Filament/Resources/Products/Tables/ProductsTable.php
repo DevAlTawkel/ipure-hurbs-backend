@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -44,7 +45,7 @@ class ProductsTable
                     }),
 
                 TextColumn::make('category.name')->label('Category'),
-                IconColumn::make('is_active')->boolean(),
+                ToggleColumn::make('is_active')->label('Published'),
                 IconColumn::make('is_featured')->boolean(),
             ])
             ->filters([

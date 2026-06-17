@@ -18,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -58,6 +59,8 @@ class CategoryResource extends Resource
                 ->default(0),
 
             Toggle::make('is_active')
+                ->label('Published')
+                ->helperText('Turn off to hide this category from the website')
                 ->default(true),
         ]);
     }
@@ -72,7 +75,7 @@ class CategoryResource extends Resource
                     ->label('Products')
                     ->counts('products'),
                 TextColumn::make('sort_order')->sortable(),
-                IconColumn::make('is_active')->boolean(),
+                ToggleColumn::make('is_active')->label('Published'),
             ])
             ->defaultSort('sort_order')
             ->recordActions([
