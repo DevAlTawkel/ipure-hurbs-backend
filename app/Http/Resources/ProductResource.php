@@ -181,8 +181,12 @@ class ProductResource extends JsonResource
 
             // ── SEO ──────────────────────────────────────────────────────
             'seo'                 => [
-                'title'       => $this->seo_title,
-                'description' => $this->seo_description,
+                'title'        => $this->seo_title ?: $this->name,
+                'description'  => $this->seo_description ?: $this->short_description,
+                'keywords'     => $this->tags ?? [],
+                'ogImage'      => $this->imageUrl() ?? '',
+                'ogImageWidth' => $this->imageUrl() ? '1200' : '',
+                'ogImageHeight'=> $this->imageUrl() ? '630' : '',
             ],
 
             'created_at'          => $this->created_at?->toIso8601String(),
