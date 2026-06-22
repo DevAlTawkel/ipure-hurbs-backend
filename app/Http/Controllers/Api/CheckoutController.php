@@ -226,6 +226,8 @@ class CheckoutController extends Controller
                 $item->product->decrement('stock', $item->qty);
             }
 
+            $order->update(['inventory_decremented' => true]);
+
             // Mark first-order discount as used
             if ($customer && $discountAmount > 0) {
                 $customer->update(['first_order_used' => true]);

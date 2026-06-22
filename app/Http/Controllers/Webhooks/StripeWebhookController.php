@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\PaymentTransaction;
+use App\Services\OrderFulfillmentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Stripe\Exception\SignatureVerificationException;
@@ -11,6 +13,10 @@ use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
+    public function __construct(
+        private readonly OrderFulfillmentService $orderFulfillment,
+    ) {}
+
     public function handle(Request $request): Response
     {
         $secret  = config('services.stripe.webhook_secret');
@@ -24,10 +30,10 @@ class StripeWebhookController extends Controller
         }
 
         match ($event->type) {
-            'payment_intent.succeeded'               => $this->handlePaymentIntentSucceeded($event->data->object),
-            'payment_intent.payment_failed'          => $this->handlePaymentIntentFailed($event->data->object),
-            'charge.refunded'                        => $this->handleChargeRefunded($event->data->object),
-            default                                  => null,
+            'payment_intent.succeeded'      => $this->handlePaymentIntentSucceeded($event->data->object),
+            'payment_intent.payment_failed'   => $this->handlePaymentIntentFailed($event->data->object),
+            'charge.refunded'                 => $this->handleChargeRefunded($event->data->object),
+            default                           => null,
         };
 
         return response('OK', 200);
@@ -37,14 +43,14 @@ class StripeWebhookController extends Controller
     {
         $order = Order::where('stripe_payment_intent_id', $paymentIntent->id)->first();
 
-        if ($order && $order->payment_status !== Order::PAYMENT_PAID) {
-            $order->update([
-                'payment_status' => Order::PAYMENT_PAID,
-                'status'         => Order::STATUS_CONFIRMED,
-                'stripe_charge_id' => $paymentIntent->latest_charge ?? null,
-                'paid_at'        => now(),
-            ]);
+        if (! $order) {
+            return;
         }
+
+        $this->orderFulfillment->markOrderPaid(
+            $order,
+            $paymentIntent->latest_charge ?? null,
+        );
     }
 
     private function handlePaymentIntentFailed(object $paymentIntent): void
@@ -53,6 +59,11 @@ class StripeWebhookController extends Controller
 
         if ($order && $order->payment_status === Order::PAYMENT_PENDING) {
             $order->update(['payment_status' => Order::PAYMENT_FAILED]);
+
+            PaymentTransaction::query()
+                ->where('order_id', $order->id)
+                ->where('transaction_id', $paymentIntent->id)
+                ->update(['status' => PaymentTransaction::STATUS_FAILED]);
         }
     }
 

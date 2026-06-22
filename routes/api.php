@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderFlowController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
@@ -76,6 +77,12 @@ Route::prefix('auth')->group(function () {
 Route::prefix('checkout')->group(function () {
     Route::post('/initiate', [CheckoutController::class, 'initiate']);
     Route::post('/confirm', [CheckoutController::class, 'confirm']);
+});
+
+// ─── Buy Now / Direct Order Flow ─────────────────────────────────────────────
+Route::prefix('order')->group(function () {
+    Route::post('/calculate', [OrderFlowController::class, 'calculate']);
+    Route::post('/create', [OrderFlowController::class, 'create']);
 });
 
 // ─── Orders (authenticated customers only) ───────────────────────────────────

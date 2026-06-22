@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -39,6 +40,7 @@ class Order extends Model
         'discount_amount',
         'discount_reason',
         'shipping_charge',
+        'shipping_method',
         'total',
         'status',
         'payment_method',
@@ -46,6 +48,7 @@ class Order extends Model
         'stripe_payment_intent_id',
         'stripe_charge_id',
         'paid_at',
+        'inventory_decremented',
         'notes',
     ];
 
@@ -56,7 +59,8 @@ class Order extends Model
             'discount_amount' => 'decimal:2',
             'shipping_charge' => 'decimal:2',
             'total'           => 'decimal:2',
-            'paid_at'         => 'datetime',
+            'paid_at'               => 'datetime',
+            'inventory_decremented' => 'boolean',
         ];
     }
 
@@ -64,8 +68,28 @@ class Order extends Model
     {
         static::creating(function (Order $order): void {
             if (blank($order->order_number)) {
-                $order->order_number = 'IPH-' . strtoupper(substr(uniqid(), -8));
+                $order->order_number = static::generateOrderNumber();
             }
+        });
+    }
+
+    public static function generateOrderNumber(): string
+    {
+        return DB::transaction(function () {
+            $year   = now()->format('Y');
+            $prefix = "IPH-{$year}";
+
+            $lastOrder = static::query()
+                ->where('order_number', 'like', "{$prefix}%")
+                ->lockForUpdate()
+                ->orderByDesc('order_number')
+                ->first();
+
+            $nextSequence = $lastOrder
+                ? ((int) substr($lastOrder->order_number, strlen($prefix))) + 1
+                : 1;
+
+            return $prefix . str_pad((string) $nextSequence, 5, '0', STR_PAD_LEFT);
         });
     }
 
@@ -77,6 +101,11 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function paymentTransactions(): HasMany
+    {
+        return $this->hasMany(PaymentTransaction::class);
     }
 
     public function isPaid(): bool
